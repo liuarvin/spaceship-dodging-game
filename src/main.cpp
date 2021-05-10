@@ -7,14 +7,13 @@
 #include <vector>
 #include <fstream>
 
-// Q16 - members in struct are public by default
 struct Position_struct {
     Position_struct(int x, int y) : x(x), y(y) {}
     int x;
     int y;
 };
 
-// Q18 - Class template
+// Class template
 template<class T>
 class Position {
 private:
@@ -28,7 +27,7 @@ public:
     void setX(T x) {this->x = x;}
     void setY(T y) {this->y = y;}
 
-    // Q11 - Overloaded operators
+    // Overloaded operators
     bool operator == (Position<T>);
     Position<T> operator + (Position<T>);
     Position<T> operator - (Position<T>);
@@ -82,7 +81,7 @@ bool Boundary::isInside(Position<int> sprite_pos) {
     && sprite_pos.getY() >= top;
 }
 
-// Q3 - Abstract class
+// Abstract class
 class Sprite {
 public:
     virtual void draw() = 0;
@@ -93,7 +92,7 @@ public:
 };
 
 class Ship : public Sprite {
-// Q1 - Correct use of access specifiers
+// Correct use of access specifiers
 private:
     std::vector<std::vector<char>> body;
 
@@ -103,7 +102,7 @@ protected:
 public:
     Ship(std::vector<std::vector<char>> b, Position<int> p) : Sprite(), body(b), pos(p) {}
 
-    // Q9 - Modified copy constructor
+    // Modified copy constructor
     Ship(const Ship &sourceShip);
     
     void draw();
@@ -119,7 +118,7 @@ Ship::Ship(const Ship &sourceShip) : body(sourceShip.body), pos(0, 0) {
     std::cout << "In copy constructor" << std::endl;
 }
 
-// Q5 - Over-riding of a method from an abstract class
+// Over-riding of a method from an abstract class
 void Ship::draw() {
     for(unsigned int row=0; row<body.size(); row++) {
         for(unsigned int col=0; col<body[row].size(); col++) {
@@ -156,7 +155,7 @@ int Ship::getHeight() {
     return body.size();
 }
 
-// Q6 - Multiple inheritance
+// Multiple inheritance
 class Rock : public Ship {
 public:
     Rock(std::vector<std::vector<char>> b, Position<int> p) : Ship(b, p) {}
@@ -168,7 +167,7 @@ void Rock::moveDown(int amount) {
     pos.setY(pos.getY() + amount);
 }
 
-// Q10 - Destructor
+// Destructor
 Rock::~Rock() {
     std::cout << "Rock destroyed" << std::endl;
 }
@@ -176,7 +175,7 @@ Rock::~Rock() {
 class RockManager {
 private:
     Boundary boundary;
-    // Q19 - Use of vector container to store objects
+    // Use of vector container to store objects
     std::vector<Rock*> active_rocks;
 
 public:
@@ -196,7 +195,7 @@ Boundary RockManager::getBoundary() {
 }
 
 void RockManager::removeRock(size_t i) {
-    // Q14 - use of delete operator
+    // use of delete operator
     delete active_rocks.at(i);
     active_rocks.erase(active_rocks.begin() + i);
 }
@@ -209,7 +208,7 @@ void clearRock(Rock* rock) {
     rock->clear();
 }
 
-// Q8 - An object passing itself to a function (not part of a class), which modifies that object
+// An object passing itself to a function (not part of a class), which modifies that object
 void moveRockDown(RockManager* rock_manager, Rock* rock, int i) {
     if(rock_manager->getBoundary().isInside(rock->getPosition())) {
         rock->moveDown(1);
@@ -220,7 +219,7 @@ void moveRockDown(RockManager* rock_manager, Rock* rock, int i) {
 
 void RockManager::updateScreen() {
     
-    // Q20 - Algorithm on vector container
+    // Algorithm on vector container
     std::for_each(active_rocks.begin(), active_rocks.end(), clearRock);
 
     for(size_t i=0; i<active_rocks.size(); i++) {
@@ -230,7 +229,7 @@ void RockManager::updateScreen() {
     std::vector<std::vector<char>> rock_body = {{'O'}};
     Position<int> rock_pos(rand() % boundary.getWidth(), 0);
 
-    // Q14 - use of new operator
+    // use of new operator
     active_rocks.push_back(new Rock(rock_body, rock_pos));
 
     std::for_each(active_rocks.begin(), active_rocks.end(), drawRock);
@@ -238,7 +237,7 @@ void RockManager::updateScreen() {
 
 class Game {
 private:
-    // Q15 - Use of static states
+    // Use of static states
     static int score;
     WINDOW* wnd;
     void displayScore();
@@ -271,14 +270,14 @@ void Game::displayScore() {
     }
 }
 
-// Q2 - Overloading the displayScore function
-// Q17 - Passing object by const reference
+// Overloading the displayScore function
+// Passing object by const reference
 void Game::displayScore(const Boundary game_area) {
     clear();
     
     std::string score_string = "SCORE: " + std::to_string(score);
     
-    // Q12 - static_cast
+    // static_cast
     float x = game_area.getWidth()/2;
     float y = game_area.getHeight()/2;
 
@@ -290,11 +289,6 @@ void Game::displayScore(const Boundary game_area) {
         mvaddch(y_pos, x_pos+i, score_string[i]);
     }
 
-    // Q12 - const_cast
-    // can't do this because const
-    // game_area.setTop(5);
-
-    // cast away const
     Boundary *new_game_area = const_cast<Boundary*>(&game_area);
     new_game_area->setTop(5);
 
@@ -316,7 +310,7 @@ void Game::run() {
     
     Ship ship(ship_body, ship_pos);
 
-    // Q12 - dynamic_cast
+    // dynamic_cast
     std::vector<std::vector<char>> rock_body = {{'-'}};
     Position<int> rock_pos(0, 0);
     Ship *dynamic_rock = new Rock(rock_body, rock_pos);
@@ -350,7 +344,7 @@ void Game::run() {
 
         ship.draw();
 
-        // Q4 - Operations on pointers to an object
+        // Operations on pointers to an object
         std::vector<Rock*> rocks = rock_manager.getRocks();
         
         for(size_t i=0; i<rocks.size(); i++) {
@@ -358,7 +352,7 @@ void Game::run() {
                 for(int k=0; k<ship.getHeight(); k++) {
                     Position<int> offset(j, k);
 
-                    // Q11 - Overloaded operators + and ==
+                    // Overloaded operators + and ==
                     if(rocks.at(i)->getPosition() == ship.getPosition() + offset) {
                         exit = true;
                     }
@@ -394,14 +388,14 @@ int main() {
     Position<int> pos(5, 5);
     Position_struct pos_struct(0, 0);
 
-    // Q16 - Difference between class and struct
+    // Difference between class and struct
     pos_struct.x = 10;
     pos_struct.y = 10;
 
     std::cout << "x_pos = " << pos.getX() << ", y_pos = " << pos.getY() << std::endl;
     std::cout << "struct x_pos = " << pos_struct.x << ", struct y_pos = " << pos_struct.y << std::endl;
 
-    // Q12 - reinterpret_cast
+    // reinterpret_cast
     Position<int> *pos_struct_to_pos_class = reinterpret_cast<Position<int>*>(&pos_struct);
     
     std::cout << "pos_struct_to_pos_class_x = " << pos_struct_to_pos_class->getX() << ", pos_struct_to_pos_class_y = " << pos_struct_to_pos_class->getY() << std::endl;
@@ -410,7 +404,6 @@ int main() {
     std::vector<std::vector<char>> ship_body = {{'X'}};
     Ship test_ship(ship_body, ship_pos);
 
-    // Q9
     Q9PassByValue(test_ship);
     Q9PassByReference(test_ship);
 
