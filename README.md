@@ -8,4 +8,4 @@ A terminal based game in C++. Uses [Ncurses](http://www.cs.ukzn.ac.za/~hughm/os/
 
 Fly the spaceship and dodge the obstacles
 
-![spaceship](https://github.com/liuarvin/spaceship-dodging-game/blob/master/spaceship.png)
+![spaceship](https://github.com/liuarvin/spaceship-dodging-game/spaceship.png)
